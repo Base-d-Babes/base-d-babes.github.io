@@ -55,21 +55,52 @@
             user-select: none;
         }
 
-        /* THE MINT CONTAINER */
-        .mint-frame {
+        /* OUTBOUND LINKS */
+        .links {
             border: 1px solid #333;
-            border-radius: 12px;
-            width: 100%;
-            height: 500px; /* Adjust based on Decent's output */
+            border-radius: 4px;
+            padding: 30px 20px;
             background: #111;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+        }
+
+        .links a {
+            display: block;
+            color: #d4d4d4;
+            text-decoration: none;
+            padding: 12px 20px;
+            margin: 10px 0;
+            border: 1px solid #444;
+            border-radius: 2px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .links a:hover {
+            background: #222;
+            border-color: #666;
+        }
+
+        .links a::before {
+            content: "→ ";
+            opacity: 0.5;
+            margin-right: 8px;
         }
 
         .footer {
             margin-top: 60px;
             font-size: 0.7rem;
             color: #444;
+        }
+
+        .footer a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #888;
         }
     </style>
 </head>
@@ -88,18 +119,22 @@
             </p>
         </div>
 
-        <div class="mint-frame">
-            <iframe
-                src="https://embed.ipfscdn.io/ipfs/bafybeigdie2yylzqlmn4lcafxh66wxqiltdhi2nppimxgcf57ho77s5w4e/erc1155.html?contract=0x5dCFeD9D2897d9EA587a30EcDA5a069461Ca46Dd&chain=%7B%22chainId%22%3A8453%2C%22rpc%22%3A%5B%22https%3A%2F%2F8453.rpc.thirdweb.com%2F%24%7BTHIRDWEB_API_KEY%7D%22%5D%7D&clientId=ed761c6efd5812770fcf82027369af31&tokenId=1&theme=dark&primaryColor=green"
-                width="100%" 
-                height="100%" 
-                frameborder="0">
-            </iframe>
+        <div class="links">
+            <a href="https://opensea.io/assets/base/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd/1" target="_blank" rel="noopener">
+                MINT OR VIEW ON OPENSEA
+            </a>
+            <a href="https://basescan.org/address/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd" target="_blank" rel="noopener">
+                VERIFY CONTRACT ON BASESCAN
+            </a>
+            <a href="https://basescan.org/token/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd?a=1" target="_blank" rel="noopener">
+                VIEW TOKEN #1 PROVENANCE
+            </a>
         </div>
 
         <div class="footer">
-            <p>CONTRACT: 0x5dC...46dd</p>
+            <p>CONTRACT: <a href="https://basescan.org/address/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd" target="_blank" rel="noopener">0x5dCFeD9D2897d9EA587a30EcDA5a069461Ca46Dd</a></p>
             <p>NETWORK: BASE</p>
+            <p>TOKEN STANDARD: ERC-1155</p>
         </div>
     </div>
 
