@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mint — The Steward | Archetype 001</title>
+    <style>
+        /* STEWARD AESTHETIC - EXECUTION SURFACE */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #0a0a0a; color: #d4d4d4; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 500px; width: 100%; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #333; }
+        h1 { font-weight: 100; letter-spacing: 3px; text-transform: uppercase; font-size: 1.3rem; margin-bottom: 8px; color: #fff; }
+        .ticker { color: #555; font-size: 0.75rem; display: block; }
+        .mint-interface { background: #111; border: 1px solid #333; border-radius: 4px; padding: 30px 20px; margin-bottom: 20px; }
+        .status { text-align: center; font-size: 0.8rem; color: #666; margin-bottom: 20px; padding: 10px; border: 1px solid #222; background: #0a0a0a; }
+        .status.connected { color: #4a9; border-color: #4a9; }
+        .wallet-section { margin-bottom: 25px; }
+        .label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        button { width: 100%; padding: 14px 20px; background: transparent; border: 1px solid #444; color: #d4d4d4; 
+                 font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; letter-spacing: 1px; 
+                 cursor: pointer; transition: all 0.2s; border-radius: 2px; text-transform: uppercase; }
+        button:hover:not(:disabled) { background: #222; border-color: #666; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        button.primary { background: #1a1a1a; border-color: #666; }
+        button.primary:hover:not(:disabled) { background: #2a2a2a; border-color: #888; }
+        .mint-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+        input[type="number"] { flex: 1; padding: 12px; background: #0a0a0a; border: 1px solid #333; color: #d4d4d4; 
+                               font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; text-align: center; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.75rem; 
+                     margin-top: 20px; padding-top: 20px; border-top: 1px solid #222; }
+        .info-item { text-align: center; padding: 8px; background: #0a0a0a; border: 1px solid #1a1a1a; }
+        .info-label { color: #666; display: block; margin-bottom: 4px; }
+        .info-value { color: #aaa; }
+        .back-link { text-align: center; margin-top: 30px; }
+        .back-link a { color: #666; text-decoration: none; font-size: 0.75rem; letter-spacing: 1px; }
+        .back-link a:hover { color: #888; }
+        .error { background: #1a0000; border: 1px solid #4a0000; color: #ff6666; padding: 12px; font-size: 0.75rem; margin-top: 15px; border-radius: 2px; }
+        .success { background: #001a00; border: 1px solid #004a00; color: #66ff66; padding: 12px; font-size: 0.75rem; margin-top: 15px; border-radius: 2px; }
+        .tx-link { color: #4a9; text-decoration: none; word-break: break-all; }
+        .tx-link:hover { text-decoration: underline; }
+        .protocol-info { font-size: 0.65rem; color: #555; margin-top: 15px; padding-top: 15px; border-top: 1px solid #1a1a1a; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Minting Terminal</h1>
+            <span class="ticker">ARCHETYPE #001 // THE STEWARD</span>
+        </header>
+        <div class="status" id="status">WALLET NOT CONNECTED</div>
+        <div class="mint-interface">
+            <div class="wallet-section">
+                <span class="label">01. Wallet Connection</span>
+                <button id="connectBtn" class="primary">CONNECT WALLET</button>
+            </div>
+            <div class="wallet-section">
+                <span class="label">02. Quantity (Max 5 per wallet)</span>
+                <div class="mint-controls">
+                    <button id="decreaseBtn" disabled>−</button>
+                    <input type="number" id="quantityInput" value="1" min="1" max="5" disabled>
+                    <button id="increaseBtn" disabled>+</button>
+                </div>
+            </div>
+            <div class="wallet-section">
+                <span class="label">03. Execute Mint</span>
+                <button id="mintBtn" disabled>MINT (0.003 ETH + GAS)</button>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">PRICE</span>
+                    <span class="info-value" id="priceDisplay">0.003 ETH</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">REMAINING</span>
+                    <span class="info-value" id="supplyDisplay">—</span>
+                </div>
+            </div>
+            <div class="protocol-info">
+                Minting via Zora Protocol Sale Strategy<br>
+                ADR-0004 Compliant Execution Surface
+            </div>
+            <div id="messageArea"></div>
+        </div>
+        <div class="back-link">
+            <a href="./index.html">← RETURN TO CANON</a>
+        </div>
+    </div>
+    <script type="module">
+        const ZORA_MINTER_ADDRESS = "0x04E2516A2c207E84a1839755675dfd8eF6302F0a";
+        const COLLECTION_ADDRESS = "0x5dCFeD9D2897d9EA587a30EcDA5a069461Ca46Dd";
+        const TOKEN_ID = 1;
+        const PRICE_PER_TOKEN = 0.003;
+        const MAX_SUPPLY = 50;
+        const MAX_PER_WALLET = 5;
+        let walletAddress = null;
+        let quantity = 1;
+        const status = document.getElementById('status');
+        const connectBtn = document.getElementById('connectBtn');
+        const mintBtn = document.getElementById('mintBtn');
+        const quantityInput = document.getElementById('quantityInput');
+        const decreaseBtn = document.getElementById('decreaseBtn');
+        const increaseBtn = document.getElementById('increaseBtn');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const supplyDisplay = document.getElementById('supplyDisplay');
+        const messageArea = document.getElementById('messageArea');
+        function updateUI() {
+            if (walletAddress) {
+                status.textContent = `CONNECTED: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+                status.classList.add('connected');
+                mintBtn.disabled = false;
+                quantityInput.disabled = false;
+                decreaseBtn.disabled = quantity <= 1;
+                increaseBtn.disabled = quantity >= MAX_PER_WALLET;
+            } else {
+                status.textContent = 'WALLET NOT CONNECTED';
+                status.classList.remove('connected');
+                mintBtn.disabled = true;
+                quantityInput.disabled = true;
+                decreaseBtn.disabled = true;
+                increaseBtn.disabled = true;
+            }
+            const totalCost = (PRICE_PER_TOKEN * quantity).toFixed(4);
+            priceDisplay.textContent = `${totalCost} ETH`;
+        }
+        function showMessage(text, type = 'error') {
+            messageArea.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => { if (type === 'success') messageArea.innerHTML = ''; }, 10000);
+        }
+        connectBtn.addEventListener('click', async () => {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showMessage('No wallet detected. Please install MetaMask or another Web3 wallet.');
+                    return;
+                }
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                walletAddress = accounts[0];
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x2105' }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x2105',
+                                chainName: 'Base',
+                                nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
+                                rpcUrls: ['https://mainnet.base.org'],
+                                blockExplorerUrls: ['https://basescan.org']
+                            }]
+                        });
+                    }
+                }
+                connectBtn.textContent = 'WALLET CONNECTED';
+                updateUI();
+                await updateSupply();
+            } catch (error) {
+                console.error('Connection error:', error);
+                showMessage('Wallet connection failed: ' + error.message);
+            }
+        });
+        decreaseBtn.addEventListener('click', () => {
+            if (quantity > 1) { quantity--; quantityInput.value = quantity; updateUI(); }
+        });
+        increaseBtn.addEventListener('click', () => {
+            if (quantity < MAX_PER_WALLET) { quantity++; quantityInput.value = quantity; updateUI(); }
+        });
+        quantityInput.addEventListener('change', (e) => {
+            let value = parseInt(e.target.value);
+            if (isNaN(value) || value < 1) value = 1;
+            if (value > MAX_PER_WALLET) value = MAX_PER_WALLET;
+            quantity = value;
+            quantityInput.value = value;
+            updateUI();
+        });
+        async function updateSupply() {
+            try {
+                const totalMinted = await window.ethereum.request({
+                    method: 'eth_call',
+                    params: [{
+                        to: COLLECTION_ADDRESS,
+                        data: '0xbd85b039' + '0000000000000000000000000000000000000000000000000000000000000001'
+                    }, 'latest']
+                });
+                const minted = parseInt(totalMinted, 16);
+                const remaining = MAX_SUPPLY - minted;
+                supplyDisplay.textContent = `${remaining} / ${MAX_SUPPLY}`;
+            } catch (error) {
+                console.error('Supply check error:', error);
+                supplyDisplay.textContent = '— / 50';
+            }
+        }
+        function encodeZoraMintCalldata(to, qty, collection, tokenId, mintReferral) {
+            const functionSelector = '0x8ee90af4';
+            const toPadded = to.slice(2).padStart(64, '0');
+            const collectionPadded = collection.slice(2).padStart(64, '0');
+            const mintReferralPadded = mintReferral.slice(2).padStart(64, '0');
+            const qtyPadded = qty.toString(16).padStart(64, '0');
+            const tokenIdPadded = tokenId.toString(16).padStart(64, '0');
+            return functionSelector + toPadded + qtyPadded + collectionPadded + tokenIdPadded + mintReferralPadded;
+        }
+        mintBtn.addEventListener('click', async () => {
+            if (!walletAddress) {
+                showMessage('Please connect your wallet first.');
+                return;
+            }
+            mintBtn.disabled = true;
+            mintBtn.textContent = 'MINTING...';
+            try {
+                const value = BigInt(Math.floor(PRICE_PER_TOKEN * quantity * 1e18));
+                const calldata = encodeZoraMintCalldata(
+                    walletAddress, quantity, COLLECTION_ADDRESS, TOKEN_ID,
+                    '0x0000000000000000000000000000000000000000'
+                );
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        from: walletAddress,
+                        to: ZORA_MINTER_ADDRESS,
+                        value: '0x' + value.toString(16),
+                        data: calldata
+                    }]
+                });
+                showMessage(
+                    `Mint successful! <br><a href="https://basescan.org/tx/${txHash}" target="_blank" class="tx-link">View transaction →</a>`,
+                    'success'
+                );
+                await updateSupply();
+            } catch (error) {
+                console.error('Mint error:', error);
+                showMessage('Mint failed: ' + (error.message || 'Unknown error'));
+            } finally {
+                mintBtn.disabled = false;
+                mintBtn.textContent = `MINT (${(PRICE_PER_TOKEN * quantity).toFixed(4)} ETH + GAS)`;
+                updateUI();
+            }
+        });
+        updateUI();
+    </script>
+</body>
+</html>

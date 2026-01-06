@@ -1,116 +1,208 @@
-# Base.d Babes — Canonical Artifact Surface
+# Based_d Babes — The Archetypes
 
-**Repository:** `base-d-babes.github.io`
-**Live Site:** [https://base-d-babes.github.io/](https://base-d-babes.github.io/)
-
----
-
-## Purpose of This Repository
-
-This repository hosts the **canonical, static artifact surface** for the Base.d Babes project.
-
-It is intentionally:
-
-* **Static** (no execution logic)
-* **Immutable** (content changes are deliberate and versioned)
-* **Non-interactive** (no wallets, SDKs, or minting logic)
-
-This site exists to preserve **canon, narrative, and reference materials** independent of any platform, marketplace, or protocol.
+**Status:** ADR-0004 Compliant  
+**Network:** Base (Chain ID: 8453)  
+**Contract:** `0x5dCFeD9D2897d9EA587a30EcDA5a069461Ca46Dd`
 
 ---
 
-## What This Site Is
+## 🎯 Quick Start
 
-* The authoritative presentation of Archetypes
-* The canonical home for essays, visual artifacts, and philosophy
-* A stable reference point that can be cited, mirrored, or archived
+### Local Development
 
----
+**The mint interface MUST be served via HTTP, not opened directly as a file.**
 
-## What This Site Is NOT
+MetaMask and other Web3 wallets only inject `window.ethereum` on `http://` or `https://` URLs, not `file://` URLs.
 
-* A minting interface
-* A Dapp
-* A wallet-connected application
-* A marketplace
+#### Option 1: Using the Helper Script (Windows)
 
-All execution logic is intentionally separated.
+```bash
+# Double-click or run:
+start-server.bat
+```
 
----
+Then visit: **http://localhost:9999/mint.html**
 
-## Minting — Read Carefully
+#### Option 2: Manual Python Server
 
-**Primary minting does NOT occur on this site.**
+```bash
+cd F:\Base_d\Base.d-Claude
+python -m http.server 9999
+```
 
-Minting is conducted via the project’s **Execution Terminal**, which is linked from this site when active.
+Then visit: **http://localhost:9999/mint.html**
 
-To mint:
+#### Option 3: Node.js (if Python unavailable)
 
-1. Visit the canonical site to understand the Archetype and its context
-2. Follow the link to the official Execution Terminal
-3. Connect your wallet and mint via the provided interface
-
-At no point is BaseScan knowledge required.
-
----
-
-## Why This Architecture Exists
-
-Platforms change.
-Indexers fail.
-Marketplaces deprecate features.
-
-Canon must survive all of that.
-
-Separating **artifact** from **execution** ensures:
-
-* Long-term accessibility
-* Reduced platform dependency
-* Clear authority boundaries
+```bash
+npx http-server -p 9999
+```
 
 ---
 
-## Community & Governance
+## 📱 Mobile Wallet Testing
 
-Community discussion, proposals, and development coordination occur via:
+To test with mobile wallets (MetaMask Mobile, Rainbow, Coinbase Wallet):
 
-* **GitHub Discussions** (this repository)
-* Canonical ADR / RFC documents
-
-No decisions are made in Discord threads, DMs, or private channels.
-
----
-
-## Repositories of Interest
-
-* **Canonical Site:** `base-d-babes.github.io`
-* **Execution / Dapp (forthcoming):** TBD
-* **Contracts & Infrastructure:** Linked as published
+1. Start local server (see above)
+2. Ensure your phone is on the same Wi-Fi network
+3. Visit: **http://192.168.40.79:9999/mint.html**
+4. Use WalletConnect or in-app browser
 
 ---
 
-## Status
+## 🏗️ Architecture
 
-* Archetype #001 — *The Steward* — Released
-* Execution Terminal — In development
-* Archetype #002 — In formation
+```
+index.html          → Static canon surface (no wallet logic)
+mint.html           → Zora-aligned mint execution surface
+start-server.bat    → Local development server launcher
+```
+
+### Governance Documents
+
+- **RFC-0001** — Minting & Canon Governance
+- **SPEC-0001** — Archetype Metadata Schema
+- **ADR-0002** — Canonical Static Site Boundary
+- **ADR-0003** — Canonical Minting Interface (superseded by ADR-0004)
+- **ADR-0004** — Zora-Aligned Mint Execution Surface
 
 ---
 
-## Official Contact
+## 🔐 Minting Architecture (ADR-0004)
 
-For formal, non-social correspondence only:
+### Zora Protocol Integration
 
-**[base.d-babes@proton.me](mailto:base.d-babes@proton.me)**
+**Minter Contract:** `0x04E2516A2c207E84a1839755675dfd8eF6302F0a`  
+**Function:** `mint(address to, uint256 quantity, address collection, uint256 tokenId, address mintReferral)`
+
+**Key Points:**
+- ✅ Uses Zora sale strategy (not raw ERC-1155)
+- ✅ No SDK dependencies
+- ✅ Pure vanilla JavaScript + Web3 provider
+- ✅ Free-tier compatible
+- ✅ Full calldata transparency
+
+### Mint Parameters
+
+| Parameter | Value |
+|-----------|-------|
+| Price | 0.003 ETH per token |
+| Max Supply | 50 tokens |
+| Per-Wallet Limit | 5 tokens |
+| Token ID | 1 (The Steward) |
 
 ---
 
-## Final Note
+## 🚀 Deployment
 
-This project values:
+### GitHub Pages (Production)
 
-* Restraint over spectacle
-* Structure over speed
-* Stewardship over hype
+```bash
+git add index.html mint.html start-server.bat README.md
+git commit -m "ADR-0004: Production deployment"
+git push origin main
+```
 
-If you are here to understand, you are early.
+Live site: **https://base-d-babes.github.io/**
+
+### Pre-Deployment Checklist
+
+- [ ] Test locally with `start-server.bat`
+- [ ] Connect MetaMask to Base network
+- [ ] Verify wallet connection works
+- [ ] Test mint flow with small amount
+- [ ] Confirm supply tracking updates
+- [ ] Check transaction on BaseScan
+
+---
+
+## 🧪 Testing
+
+### Verification Steps
+
+1. **Start Server:** Run `start-server.bat`
+2. **Open Browser:** Navigate to `http://localhost:9999/mint.html`
+3. **Connect Wallet:** Click "CONNECT WALLET"
+4. **Verify:**
+   - MetaMask popup appears
+   - Base network selected/switched automatically
+   - Wallet address displays in status bar
+   - Quantity controls become active
+   - Supply shows "X / 50"
+
+### Common Issues
+
+**Issue:** "No wallet detected"  
+**Solution:** Ensure you're accessing via `http://localhost:9999`, NOT `file://`
+
+**Issue:** "Wrong network"  
+**Solution:** Interface auto-switches to Base (8453). Confirm in MetaMask.
+
+**Issue:** Port 9999 in use  
+**Solution:** Edit `start-server.bat` and change port number
+
+---
+
+## 📋 File Structure
+
+```
+F:\Base_d\Base.d-Claude\
+├── index.html              # Static canon surface (ADR-0002)
+├── mint.html               # Zora-aligned execution surface (ADR-0004)
+├── start-server.bat        # Local development server
+├── README.md               # This file
+├── 1.json                  # Token metadata
+├── contract.json           # Collection metadata
+├── mint-base.js            # Deployment script reference
+└── [governance docs]/      # RFCs, SPECs, ADRs
+```
+
+---
+
+## 🔗 Links
+
+- **Collection:** [OpenSea](https://opensea.io/assets/base/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd/1)
+- **Contract:** [BaseScan](https://basescan.org/address/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd)
+- **Token #1:** [BaseScan](https://basescan.org/token/0x5dcfed9d2897d9ea587a30ecda5a069461ca46dd?a=1)
+
+---
+
+## 📖 Canonical Language
+
+> "Minting is conducted exclusively via the Zora Protocol sale strategy on Base. Primary minting occurs at: https://base-d-babes.github.io/mint.html"
+
+---
+
+## 🛡️ Security Notes
+
+- No private keys in code
+- No hardcoded secrets
+- No localStorage/sessionStorage
+- All transactions require wallet confirmation
+- On-chain enforcement of all limits
+- Client-side checks are advisory only
+
+---
+
+## 📚 For Developers
+
+### Modifying Mint Logic
+
+**ALL changes to mint execution MUST:**
+1. Comply with ADR-0004
+2. Use Zora sale strategy contract
+3. Maintain calldata transparency
+4. Avoid SDK dependencies
+5. Receive Steward approval (RFC-0001)
+
+**PROHIBITED:**
+- Direct ERC-1155 `mint()` calls
+- Bypassing Zora protocol layer
+- Introducing paid dependencies
+- Modifying canon surface (`index.html`)
+
+---
+
+**Last Updated:** 2026-01-05  
+**Governance Status:** ✅ Fully Compliant (ADR-0004)
